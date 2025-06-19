@@ -113,8 +113,8 @@ class Encoder(nn.Module):
         block=ResidualSEBlock,
         layers=(2, 2, 2, 2),
         channels=(64, 128, 256, 512),
-        num_channels=4,
-        proj_hidden_dim=256,
+        num_channels=6,
+        proj_hidden_dim=512,
         emb_dim=128,
         reduction=16,
         drop_rate=0.0,
@@ -267,7 +267,7 @@ def main():
     emb_list = emb.cpu().tolist()
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w") as f:
-        json.dump(emb_list, f)
+        json.dump(emb_list, f, indent=4)
     print(f"Saved 128-d embedding to {args.output}")
 
 

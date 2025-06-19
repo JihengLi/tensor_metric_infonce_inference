@@ -6,9 +6,7 @@ export OMP_NUM_THREADS=$(nproc)
 export MKL_NUM_THREADS=$OMP_NUM_THREADS
 export MRTRIX_TMPFILE_DIR=/tmp
 
-CKPT_PATH="model/dti_epoch1.pth"
-FEATURE_DIR="/output/features-128.json"
-mkdir -p "$FEATURE_DIR"
+CKPT_PATH="/opt/ml/model/dti_epoch1.pth"
 
 DEVICE="cpu"
 if command -v nvidia-smi >/dev/null 2>&1 && python - <<'PY' 2>/dev/null
@@ -47,10 +45,10 @@ find /input -type f -name "*.mha" -print0 | while IFS= read -r -d '' dwi_mha; do
         -nthreads $OMP_NUM_THREADS
 
     echo "--> $subj : extract feature"
-    python3 inference.py \
+    python3 stats_to_vector.py \
         --ckpt "$CKPT_PATH" \
         --tensor "$tensor" \
-        --output "$FEATURE_DIR" \
+        --output "/output/features-128.json" \
         --device "$DEVICE"
 
     rm -rf "$tmp"

@@ -7,7 +7,7 @@
 To build this Docker container, clone the repository and run the following command in the root directory:
 
 ```bash
-DOCKER_BUILDKIT=1 sudo docker build -t beyond_fa_pca:v0.0.5 .
+DOCKER_BUILDKIT=1 sudo docker build -t beyond_fa_infonce:v0.0.5 .
 ```
 
 The Docker runs the code from `scripts/entrypoint.sh`.
@@ -19,8 +19,8 @@ Your Docker container should be able to read input data from `/input` and write 
 To run this Docker:
 
 ```bash
-input_dir=".../Inputs"
-output_dir=".../Outputs"
+input_dir="/home-local/lij112/codes/beyond_fa_challenge/results/Inputs"
+output_dir="/home-local/lij112/codes/beyond_fa_challenge/results/Outputs-infonce"
 
 mkdir -p $output_dir
 sudo chmod 777 $output_dir
@@ -36,6 +36,6 @@ sudo docker run \
     --volume $input_dir:/input:ro \
     --volume $output_dir:/output \
     --volume "$DOCKER_NOOP_VOLUME":/tmp \
-    beyond_fa_pca:v0.0.5
+    beyond_fa_infonce:v0.0.5
 sudo docker volume rm "$DOCKER_NOOP_VOLUME" > /dev/null
 ```

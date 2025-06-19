@@ -1,6 +1,6 @@
 [project]
 name = "beyond_fa_infonce"
-version = "0.0.1"
+version = "0.0.5"
 description = "Beyond-FA Challenge using InfoNCE for Tensor Metric"
 readme = "README.md"
 requires-python = ">=3.10"

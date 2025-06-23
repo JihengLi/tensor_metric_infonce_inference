@@ -10,7 +10,7 @@ resolution-markers = [
 
 [[package]]
 name = "beyond-fa-infonce"
-version = "0.0.7"
+version = "0.0.8"
 source = { virtual = "." }
 dependencies = [
     { name = "nibabel" },

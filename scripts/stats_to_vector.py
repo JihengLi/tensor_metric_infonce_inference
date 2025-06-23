@@ -1,22 +1,29 @@
 #!/usr/bin/env python
 import argparse, json, time, torch, torchio as tio
 from model import Encoder
-from transforms import (
-    _clean_tensor,
-    _tensor_to_eigenvalues,
-    _znorm_nonzero,
-    _resize_to_64,
-)
 from pathlib import Path
 from torch.amp import autocast
 
+# from transforms import (
+#     _clean_tensor,
+#     _tensor_to_eigenvalues,
+#     _znorm_nonzero,
+#     _resize_to_64,
+# )
+# VAL_TRANSFORM = tio.Compose(
+#     [
+#         tio.Lambda(lambda t: _clean_tensor(t)),
+#         tio.Lambda(lambda t: _tensor_to_eigenvalues(t)),
+#         tio.Lambda(lambda t: _znorm_nonzero(t)),
+#         tio.Lambda(lambda t: _resize_to_64(t)),
+#     ]
+# )
 
 VAL_TRANSFORM = tio.Compose(
     [
-        tio.Lambda(lambda t: _clean_tensor(t)),
-        tio.Lambda(lambda t: _tensor_to_eigenvalues(t)),
-        tio.Lambda(lambda t: _znorm_nonzero(t)),
-        tio.Lambda(lambda t: _resize_to_64(t)),
+        tio.Lambda(lambda x: x.clone().nan_to_num_(0)),
+        tio.ZNormalization(),
+        tio.CropOrPad((64, 64, 64)),
     ]
 )
 
@@ -56,7 +63,7 @@ def main():
         "cuda" if torch.cuda.is_available() and args.device == "cuda" else "cpu"
     )
 
-    model = Encoder(num_channels=3).to(device)
+    model = Encoder(num_channels=6).to(device)
     ckpt = torch.load(args.ckpt, map_location=device, weights_only=False)
     model.load_state_dict(ckpt["model"] if "model" in ckpt else ckpt)
     model.eval()

@@ -10,25 +10,13 @@ from transforms import (
 from pathlib import Path
 from torch.amp import autocast
 
+
 VAL_TRANSFORM = tio.Compose(
     [
-        tio.Lambda(
-            lambda subj: subj["dti"].set_data(_clean_tensor(subj["dti"].data)) or subj,
-            include="dti",
-        ),
-        tio.Lambda(
-            lambda subj: subj["dti"].set_data(_tensor_to_eigenvalues(subj["dti"].data))
-            or subj,
-            include="dti",
-        ),
-        tio.Lambda(
-            lambda subj: subj["dti"].set_data(_znorm_nonzero(subj["dti"].data)) or subj,
-            include="dti",
-        ),
-        tio.Lambda(
-            lambda subj: subj["dti"].set_data(_resize_to_64(subj["dti"].data)) or subj,
-            include="dti",
-        ),
+        tio.Lambda(lambda t: _clean_tensor(t)),
+        tio.Lambda(lambda t: _tensor_to_eigenvalues(t)),
+        tio.Lambda(lambda t: _znorm_nonzero(t)),
+        tio.Lambda(lambda t: _resize_to_64(t)),
     ]
 )
 
@@ -68,7 +56,7 @@ def main():
         "cuda" if torch.cuda.is_available() and args.device == "cuda" else "cpu"
     )
 
-    model = Encoder().to(device)
+    model = Encoder(num_channels=3).to(device)
     ckpt = torch.load(args.ckpt, map_location=device, weights_only=False)
     model.load_state_dict(ckpt["model"] if "model" in ckpt else ckpt)
     model.eval()

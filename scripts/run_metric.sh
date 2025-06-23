@@ -6,7 +6,8 @@ export OMP_NUM_THREADS=$(nproc)
 export MKL_NUM_THREADS=$OMP_NUM_THREADS
 export MRTRIX_TMPFILE_DIR=/tmp
 
-CKPT_PATH="/opt/ml/model/dti_best.pth"
+# CKPT_PATH="/opt/ml/model/dti_best.pth"
+CKPT_PATH="dti_best.pth"
 
 DEVICE="cpu"
 if command -v nvidia-smi >/dev/null 2>&1 && python - <<'PY' 2>/dev/null

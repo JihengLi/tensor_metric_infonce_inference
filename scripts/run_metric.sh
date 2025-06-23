@@ -15,13 +15,12 @@ PY
 then DEVICE="cuda"; fi
 echo "Using device: $DEVICE"
 
-find /input -type f -name "*.mha" -print0 | while IFS= read -r -d '' dwi_mha; do
+dwi_mha_files=$(find /input/images/dwi-4d-brain-mri -name "*.mha")
+
+for dwi_mha in $dwi_mha_files; do
+    # Set up file names
+    json_file="/input/dwi-4d-acquisition-metadata.json"
     subj=$(basename "${dwi_mha%.*}")
-    json_file="${dwi_mha%.mha}.json"
-    if [[ ! -f $json_file ]]; then
-        echo "✗ Missing json for $subj" >&2
-        continue
-    fi
 
     tmp=/tmp/${subj}
     mkdir -p "$tmp"

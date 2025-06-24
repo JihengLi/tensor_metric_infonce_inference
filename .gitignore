@@ -178,3 +178,4 @@ local/
 tensor_paths.txt
 
 *.pth
+*.tar.gz

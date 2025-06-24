@@ -3,8 +3,6 @@ from torch import nn
 
 
 class SEBlock(nn.Module):
-    """Squeeze and Excitation block"""
-
     def __init__(self, channels, reduction=16):
         super(SEBlock, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool3d(1)
@@ -23,8 +21,6 @@ class SEBlock(nn.Module):
 
 
 class ResidualSEBlock(nn.Module):
-    """Block for ResNet3D with SE attention"""
-
     expansion = 1
 
     def __init__(
@@ -73,8 +69,6 @@ class ResidualSEBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    """3D ResNet encoder with SE attention"""
-
     def __init__(
         self,
         block=ResidualSEBlock,
@@ -88,7 +82,6 @@ class Encoder(nn.Module):
     ):
         super(Encoder, self).__init__()
         self.in_channels = channels[0]
-        # 7x7x7 conv -> BN -> ReLU -> 3x3x3 max pool
         self.conv1 = nn.Conv3d(
             num_channels,
             self.in_channels,
@@ -100,8 +93,6 @@ class Encoder(nn.Module):
         self.bn1 = nn.BatchNorm3d(self.in_channels)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool3d(kernel_size=3, stride=2, padding=1)
-        # Residual layers
-        # layer1: output channels = channels[0], stride=1
         self.layer1 = self._make_layer(
             block,
             channels[0],
@@ -110,7 +101,6 @@ class Encoder(nn.Module):
             reduction=reduction,
             drop_rate=drop_rate,
         )
-        # layer2: output channels = channels[1], stride=2 (downsample)
         self.layer2 = self._make_layer(
             block,
             channels[1],
@@ -119,7 +109,6 @@ class Encoder(nn.Module):
             reduction=reduction,
             drop_rate=drop_rate,
         )
-        # layer3: output channels = channels[2], stride=2
         self.layer3 = self._make_layer(
             block,
             channels[2],
@@ -128,7 +117,6 @@ class Encoder(nn.Module):
             reduction=reduction,
             drop_rate=drop_rate,
         )
-        # layer4: output channels = channels[3], stride=2
         self.layer4 = self._make_layer(
             block,
             channels[3],
@@ -187,19 +175,15 @@ class Encoder(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        # Input shape: (batch, 4, D, H, W)
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
-        # Residual blocks
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        # Global average pool to (batch, channels, 1, 1, 1)
         x = self.global_pool(x)
-        # flatten to (batch, channels)
         x = torch.flatten(x, 1)
         if self.emb_dropout is not None:
             x = self.emb_dropout(x)

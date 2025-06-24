@@ -1,29 +1,21 @@
 #!/usr/bin/env python
 import argparse, json, time, torch, torchio as tio
+
 from model import Encoder
 from pathlib import Path
 from torch.amp import autocast
 
-# from transforms import (
-#     _clean_tensor,
-#     _tensor_to_eigenvalues,
-#     _znorm_nonzero,
-#     _resize_to_64,
-# )
-# VAL_TRANSFORM = tio.Compose(
-#     [
-#         tio.Lambda(lambda t: _clean_tensor(t)),
-#         tio.Lambda(lambda t: _tensor_to_eigenvalues(t)),
-#         tio.Lambda(lambda t: _znorm_nonzero(t)),
-#         tio.Lambda(lambda t: _resize_to_64(t)),
-#     ]
-# )
+from transforms import (
+    clean_tensor,
+    znorm_nonzero,
+    resize_to_64,
+)
 
 VAL_TRANSFORM = tio.Compose(
     [
-        tio.Lambda(lambda x: x.clone().nan_to_num_(0)),
-        tio.ZNormalization(),
-        tio.CropOrPad((64, 64, 64)),
+        tio.Lambda(lambda t: clean_tensor(t)),
+        tio.Lambda(lambda t: znorm_nonzero(t)),
+        tio.Lambda(lambda t: resize_to_64(t)),
     ]
 )
 
